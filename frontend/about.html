@@ -1,0 +1,67 @@
+<section id="about" class="about-section">
+  <div class="overlay">
+    <div class="container py-5">
+      <a href="index.html" class="back-arrow">←</a>
+
+      <h2 class="text-center mb-4">About EduCaption</h2>
+      <p class="lead text-light text-justify">
+        EduCaption is an innovative platform designed to make education more inclusive, ensuring learning is accessible to everyone, regardless of physical limitations or impairments. With a strong focus on individuals with hearing or visual challenges, EduCaption provides assistive tools that enhance the learning experience for all students. 
+        <br><br>
+        Key features include <strong>real-time captioning</strong> for hearing-impaired learners, <strong>screen reading integration</strong> for visually impaired students, and a suite of interactive tools such as whiteboards, scheduling, and adaptive learning modules. 
+        <br><br>
+        By fostering an inclusive learning environment where no student is left behind, EduCaption empowers students to reach their full potential. Its mission is to <em>break down barriers in education</em>, making it more equitable, interactive, and barrier-free for all learners.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+/* About Section CSS */
+.about-section {
+  position: relative;                 /* needed for overlay positioning */
+  background-image: url("img6.jpg");  /* replace with your image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;       /* optional: remove if mobile issues */
+  min-height: 100vh;                  /* section grows with content */
+  width: 100%;
+  color: white;
+  display: flex;                      
+  justify-content: center;            
+  align-items: center;                
+  padding: 50px 20px;                 
+  box-sizing: border-box;
+}
+
+.about-section .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;                       /* full section height */
+  background: rgba(0, 0, 0, 0.6);     /* dark overlay for readability */
+  z-index: 1;
+}
+
+.about-section .content {
+  position: relative;
+  z-index: 2;                          /* above overlay */
+  max-width: 800px;                    /* optional, for text wrapping */
+  text-align: center;
+}
+
+
+  .back-arrow {
+    display: inline-block;
+    font-size: 28px;
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .back-arrow:hover,
+  .back-arrow:active {
+    color: red;
+  }
+</style>

@@ -1,0 +1,9 @@
+# Node.js dependencies
+node_modules/
+
+# Environment files (API keys, secrets)
+backend/.env
+
+# OS generated files
+.DS_Store
+Thumbs.db

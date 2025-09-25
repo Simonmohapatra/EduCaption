@@ -1,0 +1,190 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contact — EduCaption</title>  <!-- Bootstrap CSS (safe to include even if your site already uses it) -->  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">  <style>
+    :root{
+      --primary: #2c67bf;
+      --muted: #6b7280;
+      --card-bg: #fff;
+    }
+    body{font-family: Poppins, Arial, sans-serif; background:#f6f8fb; margin:0}
+    .top-nav { background: var(--primary); color:#fff; padding:12px 18px; }
+    .top-nav .navbar-brand { color:#fff; font-weight:600; }
+    .page-title { padding: 28px 0; text-align:center; color:var(--primary); font-weight:600; }
+    .contact-card { background: var(--card-bg); border-radius:12px; padding:22px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    .contact-card h4{ margin-bottom:8px; }
+    .contact-item { color:var(--muted); margin-bottom:10px; display:block; }
+    .support-link{ color:#6f42c1; text-decoration:none; font-weight:600; }
+    .form-card { background: var(--card-bg); border-radius:12px; padding:18px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+    .btn-white-black { background:#fff; color:#000; border:1px solid #eee; }
+    .small-note { color:var(--muted); font-size:0.9rem; margin-top:8px; }
+    @media (max-width: 767px) {
+      .page-title { padding:18px 8px; }
+      .container { padding-left:12px; padding-right:12px; }
+    }
+  </style></head>
+<body>
+  
+    <!-- NAVBAR (copy your site's nav here if you already have one) -->  <nav class="top-nav d-flex align-items-center">
+    <div class="container d-flex align-items-center">
+      <a class="navbar-brand me-3" href="index.html">EduCaption</a><!-- right side links -->
+  <div class="ms-auto">
+    <a class="text-white text-decoration-none me-3" href="index.html">Home</a>
+    <a class="text-white text-decoration-none me-3" href="about.html">About</a>
+    <a class="text-white text-decoration-none me-3" href="tools.html">Tools</a>
+    <a class="text-white text-decoration-none" href="contact.html">Contact Us</a>
+  </div>
+</div>
+
+  </nav>  <!-- Page title -->  <div class="page-title">
+    <h2>Contact Us</h2>
+    <p class="small-note">Have a question? Send us a message or use the contact details below.</p>
+  </div>  <!-- Main content -->  <div class="container mb-5">
+    <div class="row gy-4">
+      <!-- Left : Contact details -->
+      <div class="col-lg-4">
+        <div class="contact-card">
+          <h4>Contact</h4><div class="contact-item"><strong>Riya Singh</strong></div>
+      <div class="contact-item"><strong>Shubhrasmita Acharjya</strong></div>
+
+      <div class="contact-item">Phone: <a href="tel:+919798566707">+91 9798566707</a></div>
+      <div class="contact-item">Phone: <a href="tel:+917008090771">+91 7008090771</a></div>
+
+      <div class="contact-item">Email: <a href="mailto:riyasinghjsr2410@gmail.com">riyasinghjsr2410@gmail.com</a></div>
+     
+
+      <div class="contact-item">Location: Bhubaneswar, Odisha</div>
+
+      <div style="margin-top:14px;">
+        <a href="#" class="support-link">24/7 AI Support</a>
+      </div>
+      <p class="small-note mt-3">Prefer email? Fill the form and we'll reply as soon as possible.</p>
+    </div>
+  </div>
+
+  <!-- Right : Contact form -->
+  <div class="col-lg-8">
+    <div class="form-card">
+      <h4>Send us a message</h4>
+
+      <!-- FORM: by default the script below will save locally.
+           To send email, replace FORM_ENDPOINT with your Formspree URL -->
+      <form id="contactForm">
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label class="form-label">Your name</label>
+            <input required class="form-control" id="name" placeholder="Your full name">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input required type="email" class="form-control" id="email" placeholder="you@example.com">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Phone (optional)</label>
+            <input class="form-control" id="phone" placeholder="+91 9XXXXXXXXX">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Subject</label>
+            <input class="form-control" id="subject" placeholder="Message subject">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Message</label>
+            <textarea required class="form-control" id="message" rows="6" placeholder="Write your message..."></textarea>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 mt-3">
+          <button type="submit" class="btn btn-primary">Send Message</button>
+          <button type="button" id="clearLocalBtn" class="btn btn-white-black">Save Locally</button>
+          <div id="formStatus" style="margin-left:12px;color:green;display:none;"></div>
+        </div>
+
+        <p class="small-note mt-2">If you want submissions via email, sign up at Formspree (free) and add your form endpoint in the JS below.</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+  </div>  <!-- Optional footer -->  <footer class="text-center py-4" style="color:var(--muted);">
+    © EduCaption
+  </footer>  <script>
+    // ====== CONFIG ======
+    // If you sign up at https://formspree.io, create a form and replace the URL below:
+    // Example: const FORM_ENDPOINT = "https://formspree.io/f/abcxyz";
+    const FORM_ENDPOINT = "https://formspree.io/f/mvgberkb";
+
+    // ====== Form handling ======
+    const form = document.getElementById('contactForm');
+    const statusEl = document.getElementById('formStatus');
+
+    function showStatus(msg, color='green') {
+      statusEl.style.display = 'inline-block';
+      statusEl.style.color = color;
+      statusEl.innerText = msg;
+      setTimeout(()=> statusEl.style.display='none', 4000);
+    }
+
+    // Save to localStorage (fallback)
+    function saveLocally(payload) {
+      const key = 'contact_submissions';
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      existing.unshift({ts: Date.now(), ...payload});
+      localStorage.setItem(key, JSON.stringify(existing));
+    }
+
+    // On manual "Save Locally" button
+    document.getElementById('clearLocalBtn').addEventListener('click', () => {
+      const payload = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        subject: document.getElementById('subject').value.trim(),
+        message: document.getElementById('message').value.trim()
+      };
+      saveLocally(payload);
+      showStatus('Saved locally ✔');
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        subject: document.getElementById('subject').value.trim(),
+        message: document.getElementById('message').value.trim()
+      };
+
+      // If user set FORM_ENDPOINT, send it
+      if (FORM_ENDPOINT && !FORM_ENDPOINT.includes('REPLACE_WITH')) {
+        try {
+          const res = await fetch(FORM_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            form.reset();
+            showStatus('Message sent! We will contact you soon.');
+          } else {
+            throw new Error('Form submission failed');
+          }
+        } catch (err) {
+          // fallback save locally
+          saveLocally(payload);
+          showStatus('Unable to send. Saved locally.', 'orange');
+          console.error(err);
+        }
+        return;
+      }
+
+      // If no endpoint configured: save locally and notify
+      saveLocally(payload);
+      form.reset();
+      showStatus('Saved locally. (No email endpoint configured)', 'orange');
+    });
+  </script></body>
+</html>

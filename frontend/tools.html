@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduCaption</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4A90E2;
+      --secondary-color: #F7F9FC;
+      --card-bg: #FFFFFF;
+      --text-color: #2D3748;
+      --shadow-color: rgba(0, 0, 0, 0.08);
+      --font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-family);
+      margin: 0;
+      padding: 0;
+      background: var(--secondary-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--primary-color);
+      color: white;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      margin: 0;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .header-actions {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+    }
+
+    .header-actions button {
+      background: transparent;
+      border: 2px solid white;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .header-actions button:hover {
+      background-color: white;
+      color: var(--primary-color);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 30px;
+      margin-bottom: 30px;
+      border-radius: 16px;
+      box-shadow: 0px 8px 15px var(--shadow-color);
+    }
+
+    .card h2 {
+      display: flex;
+      align-items: center;
+      font-size: 1.8em;
+      font-weight: 600;
+      margin-top: 0;
+      color: var(--primary-color);
+    }
+
+    .card h2 .icon {
+      margin-right: 15px;
+      font-size: 1.2em;
+    }
+
+    .whiteboard-container {
+      position: relative;
+    }
+
+    #whiteboard {
+      border: 3px solid var(--primary-color);
+      width: 100%;
+      height: 600px;
+      border-radius: 12px;
+      cursor: crosshair;
+      background: #fff;
+    }
+
+    #caption-overlay {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.2em;
+      color: white;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
+      border-radius: 8px;
+      max-width: 90%;
+      text-align: center;
+      white-space: pre-wrap;
+    }
+
+    #recording-indicator {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #E53E3E;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      display: none;
+      z-index: 10;
+      animation: pulse 1.5s infinite;
+    }
+
+    .recording-paused-indicator {
+      background: orange !important;
+      display: block !important;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Toolbar */
+    #toolbar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid var(--primary-color);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 8px;
+      cursor: default;
+      z-index: 20;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #toolbar button,
+    #toolbar select,
+    #toolbar input[type="color"] {
+      font-size: 1.5em;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 8px;
+      transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+      border-radius: 8px;
+    }
+
+    #toolbar button:hover,
+    #toolbar select:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    #toolbar button.active {
+      color: white;
+      background-color: var(--primary-color);
+    }
+
+    #toolbar select {
+      font-size: 1em;
+      padding: 5px;
+      border: 1px solid #ccc;
+      background: white;
+    }
+
+    #toolbar input[type="color"] {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 1px solid #ccc;
+      visibility: hidden;
+    }
+
+    .color-picker-container {
+      position: relative;
+    }
+
+    .color-picker-container button {
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .color-picker-container.active button {
+      border-color: black;
+    }
+
+    .color-picker-container input[type="color"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* New styles for the merged button popup */
+    .merged-btn-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    #eraser-popup {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--card-bg);
+      border: 1px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 8px;
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #eraser-popup.show {
+      display: flex;
+    }
+
+    #eraser-popup button {
+      font-size: 1.2em;
+    }
+
+    #eraser-popup button:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Custom confirmation modal */
+    #confirmation-modal,
+    #delete-confirmation-modal,
+    #video-modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    #video-modal .modal-content {
+      max-width: 800px;
+    }
+
+    #video-player {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    #video-modal-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg);
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid var(--primary-color);
+      width: 80%;
+      max-width: 400px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4-12px var(--shadow-color);
+    }
+
+    .modal-content p {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .modal-buttons button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.2s;
+    }
+
+    #confirm-clear,
+    #confirm-delete {
+      background-color: #E53E3E;
+      color: white;
+    }
+
+    #confirm-clear:hover,
+    #confirm-delete:hover {
+      background-color: #C53030;
+    }
+
+    #cancel-clear,
+    #cancel-delete {
+      background-color: #ddd;
+      color: var(--text-color);
+    }
+
+    #cancel-clear:hover,
+    #cancel-delete:hover {
+      background-color: #ccc;
+    }
+
+    /* Saved Audios Page Styling */
+    #saved-audios-page {
+      display: none;
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--secondary-color);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    #saved-audios-page h2,
+    #class-scheduler h3 {
+      text-align: center;
+      color: var(--primary-color);
+      font-size: 2em;
+    }
+
+    #saved-audios-list,
+    #saved-videos-list,
+    #schedule-list {
+      list-style: none;
+      padding: 0;
+      max-width: 1000px;
+      margin: 20px auto;
+    }
+
+    .audio-item {
+      background: var(--card-bg);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .audio-item .audio-details {
+      margin-bottom: 15px;
+    }
+
+    .audio-item .audio-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+
+    .audio-item .audio-controls button,
+    .video-item button,
+    .video-item a {
+      background-color: var(--primary-color);
+      color: white;
+      border: 1px solid var(--primary-color);
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s, transform 0.1s;
+      font-size: 1em;
+      min-width: 100px;
+      flex-shrink: 0;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .audio-item .audio-controls button:hover,
+    .video-item button:hover,
+    .video-item a:hover {
+      background-color: #3a7ac2;
+    }
+
+    .audio-item .audio-controls button:active,
+    .video-item button:active,
+    .video-item a:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .audio-item .audio-controls .delete-icon,
+    .video-item .delete-icon {
+      cursor: pointer;
+      color: #E53E3E;
+      font-size: 1.2em;
+      margin-left: 10px;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .audio-item .audio-controls .delete-icon:hover,
+    .video-item .delete-icon:hover {
+      color: #C53030;
+    }
+
+    .video-item {
+      background: var(--card-bg);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .video-item .video-details {
+      font-weight: bold;
+      flex-grow: 1;
+    }
+
+    .video-item .video-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .back-btn-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-btn-container button {
+      background: #f4f4f4;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Class Scheduler */
+    #class-scheduler {
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 20px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    #class-scheduler form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    #class-scheduler select,
+    #class-scheduler button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+      background-color: white;
+    }
+
+    #class-scheduler button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    #class-scheduler button:hover {
+      background-color: #3a7ac2;
+    }
+
+    .time-select-group {
+      display: flex;
+      gap: 5px;
+    }
+
+    .schedule-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .schedule-actions button,
+    .schedule-actions i {
+      background: none;
+      color: #333;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+
+    .schedule-actions button:hover {
+      background: #bbb;
+    }
+
+    .class-delete-icon {
+      cursor: pointer;
+      margin-left: 10px;
+      color: #E53E3E;
+    }
+
+    .class-delete-icon:hover {
+      color: #C53030;
+    }
+
+    /* Fullscreen PDF Viewer styles */
+    #pdf-viewer-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 110;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #pdf-viewer-canvas {
+      border: 1px solid var(--primary-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      max-width: 100%;
+      /* Ensures canvas fits within the container */
+      max-height: 100%;
+    }
+
+    #pdf-viewer-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      gap: 10px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      border-radius: 12px;
+    }
+
+    #pdf-viewer-controls button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    @media (max-width: 768px) {
+
+      .container,
+      #class-scheduler {
+        padding: 0 10px;
+      }
+
+      #class-scheduler form {
+        flex-direction: column;
+      }
+
+      .audio-item .audio-controls {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1><i class="fas fa-pen-fancy"></i> EduCaption</h1>
+    <p>Interactive Whiteboard with Real-Time Captions & Recording</p>
+    <div class="header-actions">
+      <button id="saved-audios-btn" title="Saved Audios"><i class="fas fa-music"></i> Saved Audios</button>
+    </div>
+  </header>
+
+  <main class="container" id="whiteboard-page">
+    <section class="card whiteboard-card">
+      <h2><span class="icon"><i class="fas fa-chalkboard-teacher"></i></span> Whiteboard</h2>
+      <div class="whiteboard-container">
+        <canvas id="whiteboard" width="1200" height="600"></canvas>
+        <div id="caption-overlay">Captions will appear here...</div>
+        <div id="recording-indicator">
+          <i class="fas fa-circle-dot"></i> Recording...
+        </div>
+
+        <div id="toolbar">
+          <div class="color-picker-container">
+            <button title="Pick Color">
+              <i class="fas fa-palette"></i>
+            </button>
+            <input type="color" id="color-picker" value="#4A90E2">
+          </div>
+
+          <button id="pen-btn" class="active" title="Pen Tool"><i class="fas fa-pen-nib"></i></button>
+
+          <div class="merged-btn-container">
+            <button id="eraser-toggle-btn" title="Eraser & Clear"><i class="fas fa-eraser"></i></button>
+            <div id="eraser-popup">
+              <button id="eraser-btn" title="Eraser Tool"><i class="fas fa-eraser"></i></button>
+              <button id="clear-board-btn" title="Clear All"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+
+          <button id="prev-page-btn" title="Previous Page"><i class="fas fa-arrow-left"></i></button>
+          <button id="next-page-btn" title="Next Page"><i class="fas fa-arrow-right"></i></button>
+          <button id="new-page-btn" title="New Page"><i class="fas fa-plus"></i></button>
+          <button id="open-file-btn" title="Open PDF or PPT"><i class="fas fa-file-upload"></i></button>
+          <input type="file" id="file-input" accept=".pdf, .pptx" style="display: none;">
+
+          <button id="caption-toggle" title="Toggle Captions"><i class="fas fa-closed-captioning"></i></button>
+          <select id="language-select" title="Caption Language">
+            <option value="en-US">English</option>
+            <option value="hi-IN">Hindi</option>
+          </select>
+          <button id="screen-record-btn" title="Screen Record"><i class="fas fa-video"></i></button>
+          <button id="record-start" title="Start Recording"><i class="fas fa-circle-dot"></i></button>
+          <button id="record-pause-resume" title="Pause Recording"><i class="fas fa-pause"></i></button>
+          <button id="record-stop" title="Stop Recording"><i class="fas fa-stop"></i></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="pdf-viewer-container" style="display: none;">
+    <canvas id="pdf-viewer-canvas"></canvas>
+    <div id="pdf-viewer-controls" style="display: none;">
+      <button id="pdf-prev-page">Previous</button>
+      <span id="pdf-page-indicator"></span>
+      <button id="pdf-next-page">Next</button>
+      <button id="pdf-exit-btn">Exit Fullscreen</button>
+    </div>
+  </div>
+
+  <div id="saved-audios-page">
+    <div class="back-btn-container">
+      <button id="back-to-whiteboard-btn"><i class="fas fa-arrow-left"></i> Back to Whiteboard</button>
+    </div>
+    <div class="card">
+      <h2><i class="fas fa-music"></i> Saved Audios</h2>
+      <ul id="saved-audios-list">
+      </ul>
+    </div>
+    <div class="card">
+      <h2><i class="fas fa-video"></i> Saved Videos</h2>
+      <ul id="saved-videos-list">
+      </ul>
+    </div>
+    <div class="card">
+      <h3><i class="fas fa-calendar-alt"></i> Class Schedule</h3>
+      <div id="class-scheduler">
+        <form id="schedule-form">
+          <select id="class-day" required>
+            <option value="">Select Day</option>
+          </select>
+          <select id="class-start" required>
+            <option value="">From Time</option>
+          </select>
+          <select id="class-end" required>
+            <option value="">To Time
+          </select>
+          <select id="class-subject" required>
+            <option value="">Select Subject</option>
+          </select>
+          <button type="submit" id="add-class-btn"><i class="fas fa-plus"></i> Add Class</button>
+        </form>
+        <ul id="schedule-list">
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmation-modal">
+    <div class="modal-content">
+      <p>Are you sure you want to clear the entire whiteboard?</p>
+      <div class="modal-buttons">
+        <button id="confirm-clear">Yes, Clear</button>
+        <button id="cancel-clear">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-confirmation-modal">
+    <div class="modal-content">
+      <p>Are you sure you want to delete this <span id="delete-item-type"></span> recording?</p>
+      <div class="modal-buttons">
+        <button id="confirm-delete">Yes, Delete</button>
+        <button id="cancel-delete">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="video-modal">
+    <div class="modal-content">
+      <video id="video-player" controls></video>
+      <div id="video-modal-controls">
+        <label for="video-speed-selector">Playback Speed:</label>
+        <select id="video-speed-selector">
+          <option value="0.5">0.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x</option>
+        </select>
+      </div>
+      <div class="modal-buttons">
+        <button id="close-video-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
+
+    /* ================= WHITEBOARD & PAGE MANAGEMENT ================= */
+    const whiteboardPage = document.getElementById("whiteboard-page");
+    const savedAudiosPage = document.getElementById("saved-audios-page");
+    const backToWhiteboardBtn = document.getElementById("back-to-whiteboard-btn");
+    const canvas = document.getElementById("whiteboard");
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+    let drawMode = "pen";
+    let currentColor = "#4A90E2";
+    const penSize = 3;
+    const eraserSize = 20;
+
+    let pages = [];
+    let currentPage = 0;
+    let classSchedule = [];
+    let savedVideos = [];
+    let deleteItemId = null;
+    let deleteItemType = '';
+    let currentAudio = null;
+    let currentVideo = null;
+
+    // Initialize with a blank page
+    pages.push(canvas.toDataURL());
+
+    function savePage() {
+      pages[currentPage] = canvas.toDataURL();
+    }
+
+    function loadPage(pageIndex) {
+      if (pageIndex >= 0 && pageIndex < pages.length) {
+        savePage();
+        currentPage = pageIndex;
+        const img = new Image();
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+        };
+        img.src = pages[currentPage];
+      }
+    }
+
+    function newPage() {
+      savePage();
+      currentPage++;
+      pages.push("");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function nextPage() {
+      if (currentPage < pages.length - 1) {
+        loadPage(currentPage + 1);
+      } else {
+        newPage();
+      }
+    }
+
+    function prevPage() {
+      if (currentPage > 0) {
+        loadPage(currentPage - 1);
+      }
+    }
+
+    function showSavedAudiosPage() {
+      whiteboardPage.style.display = "none";
+      savedAudiosPage.style.display = "block";
+      renderClassSchedule();
+      renderSavedAudios(document.getElementById("saved-audios-list"));
+      renderSavedVideos();
+    }
+
+    function hideSavedAudiosPage() {
+      whiteboardPage.style.display = "block";
+      savedAudiosPage.style.display = "none";
+      loadPage(currentPage);
+    }
+
+    function renderSavedAudios(scheduleList) {
+      scheduleList.innerHTML = "";
+      let hasAudios = false;
+
+      classSchedule.forEach((classItem) => {
+        if (classItem.audio) {
+          hasAudios = true;
+          const audioUrl = classItem.audio.url;
+          const listItem = document.createElement("li");
+          listItem.className = "audio-item";
+
+          listItem.innerHTML = `
+            <div class="audio-details">
+                <strong>${classItem.date} - ${classItem.subject} - ${classItem.day} (${classItem.start} - ${classItem.end})</strong>
+            </div>
+            <div class="audio-controls">
+                <button class="audio-button play-button" data-id="${classItem.id}" onclick="playAudio(${classItem.id}, this)">🔊 Play</button>
+                <button class="audio-button" onclick="downloadAudio(${classItem.id})">⬇️ Download</button>
+                <button class="audio-button" onclick="showCaptions(${classItem.id})">💬 Show Captions</button>
+                <button class="audio-button" onclick="downloadCaptions(${classItem.id})">📝 Download Caption</button>
+                <button class="audio-button" onclick="generateSummary(${classItem.id})">📝 Generate Summary</button>
+                <i class="fas fa-trash-alt delete-icon" onclick="showDeleteConfirmation(${classItem.id}, 'audio')" title="Delete Audio"></i>
+                <label>Speed:</label>
+                <select onchange="updateAudioSpeed(this, ${classItem.id})">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+          `;
+
+          document.getElementById("saved-audios-list").appendChild(listItem);
+        }
+      });
+      if (!hasAudios) {
+        document.getElementById("saved-audios-list").innerHTML = "<p style='text-align:center;'>No saved audios yet. Start a recording to save one!</p>";
+      }
+    }
+
+    function renderSavedVideos() {
+      const videoList = document.getElementById("saved-videos-list");
+      videoList.innerHTML = "";
+      if (savedVideos.length === 0) {
+        videoList.innerHTML = "<p style='text-align:center;'>No saved videos yet.</p>";
+        return;
+      }
+      savedVideos.forEach((videoItem) => {
+        const listItem = document.createElement("li");
+        listItem.className = "video-item";
+        listItem.innerHTML = `
+                <div class="video-details">
+                    <span><strong>${videoItem.date}</strong> - ${videoItem.filename}</span>
+                </div>
+                <div class="video-controls">
+                    <button onclick="playVideo(${videoItem.id})">▶️ Play</button>
+                    <a href="${videoItem.url}" download="${videoItem.filename}">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                    <i class="fas fa-trash-alt delete-icon" onclick="showDeleteConfirmation(${videoItem.id}, 'video')" title="Delete Video"></i>
+                </div>
+            `;
+        videoList.appendChild(listItem);
+      });
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('classSchedule', JSON.stringify(classSchedule));
+      localStorage.setItem('savedVideos', JSON.stringify(savedVideos));
+    }
+
+    function loadFromLocalStorage() {
+      const storedSchedule = localStorage.getItem('classSchedule');
+      if (storedSchedule) {
+        classSchedule = JSON.parse(storedSchedule);
+      }
+      const storedVideos = localStorage.getItem('savedVideos');
+      if (storedVideos) {
+        savedVideos = JSON.parse(storedVideos);
+      }
+    }
+
+    function blobToBase64(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    function base64ToBlob(base64, mimeType = '') {
+      const parts = base64.split(';base64,');
+      if (parts.length === 2) {
+        mimeType = parts[0].split(':')[1];
+        base64 = parts[1];
+      }
+      const binary = atob(base64);
+      const array = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        array[i] = binary.charCodeAt(i);
+      }
+      return new Blob([array], { type: mimeType });
+    }
+
+    // Class Schedule Logic
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const subjects = ["Math", "Physics", "Chemistry", "Biology", "History", "English"];
+
+    function populateDropdowns() {
+      const daySelect = document.getElementById("class-day");
+      const fromTimeSelect = document.getElementById("class-start");
+      const toTimeSelect = document.getElementById("class-end");
+      const subjectSelect = document.getElementById("class-subject");
+
+      days.forEach(day => {
+        const option = document.createElement("option");
+        option.value = day;
+        option.text = day;
+        daySelect.appendChild(option);
+      });
+
+      // Populate time options in 1-minute increments
+      for (let h = 0; h < 24; h++) {
+        for (let m = 0; m < 60; m++) {
+          const hour = h < 10 ? '0' + h : h;
+          const minute = m < 10 ? '0' + m : m;
+          const time = `${hour}:${minute}`;
+
+          const optionFrom = document.createElement("option");
+          optionFrom.value = time;
+          optionFrom.text = time;
+          fromTimeSelect.appendChild(optionFrom);
+
+          const optionTo = document.createElement("option");
+          optionTo.value = time;
+          optionTo.text = time;
+          toTimeSelect.appendChild(optionTo);
+        }
+      }
+
+      subjects.forEach(subject => {
+        const option = document.createElement("option");
+        option.value = subject;
+        option.text = subject;
+        subjectSelect.appendChild(option);
+      });
+    }
+
+    function renderClassSchedule() {
+      const scheduleList = document.getElementById("schedule-list");
+      scheduleList.innerHTML = "";
+      if (classSchedule.length === 0) {
+        scheduleList.innerHTML = "<p style='text-align:center;'>No classes scheduled yet.</p>";
+        return;
+      }
+      classSchedule.forEach((classItem, index) => {
+        const li = document.createElement("li");
+        li.dataset.id = classItem.id;
+        li.dataset.day = classItem.day;
+        li.dataset.subject = classItem.subject;
+        li.dataset.start = classItem.start;
+        li.dataset.end = classItem.end;
+        li.innerHTML = `
+            <span><strong>${classItem.subject}</strong> - ${classItem.day} (${classItem.start} - ${classItem.end})</span>
+            <i class="fas fa-trash-alt class-delete-icon" onclick="deleteClass(${classItem.id})" title="Delete Class"></i>
+        `;
+        scheduleList.appendChild(li);
+      });
+    }
+
+    function deleteClass(id) {
+      const classIndex = classSchedule.findIndex(item => item.id === id);
+      if (classIndex > -1) {
+        classSchedule.splice(classIndex, 1);
+        saveToLocalStorage();
+        renderClassSchedule();
+        renderSavedAudios(document.getElementById("saved-audios-list"));
+      }
+    }
+
+    document.getElementById("schedule-form").onsubmit = (e) => {
+      e.preventDefault();
+      let day = document.getElementById("class-day").value;
+      let subject = document.getElementById("class-subject").value;
+      let start = document.getElementById("class-start").value;
+      let end = document.getElementById("class-end").value;
+
+      if (day && subject && start && end) {
+        let id = Date.now();
+        classSchedule.push({ id: id, day: day, subject: subject, start: start, end: end });
+        renderClassSchedule();
+        saveToLocalStorage();
+        e.target.reset();
+      } else {
+        alert("Please fill all the fields.");
+      }
+    };
+
+
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mouseup", stopDrawing);
+    canvas.addEventListener("mousemove", draw);
+
+    function startDrawing(e) {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    }
+
+    function stopDrawing() {
+      if (drawing) {
+        drawing = false;
+        savePage();
+      }
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      ctx.lineWidth = (drawMode === "eraser") ? eraserSize : penSize;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = (drawMode === "eraser") ? "#fff" : currentColor;
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+    }
+
+    function setTool(mode) {
+      drawMode = mode;
+      document.querySelectorAll("#toolbar button").forEach(b => {
+        b.classList.remove("active");
+      });
+      document.querySelector('.color-picker-container').classList.remove('active');
+
+      if (mode === "pen") document.getElementById("pen-btn").classList.add("active");
+      if (mode === "eraser") document.getElementById("eraser-toggle-btn").classList.add("active");
+      if (mode === "color") document.querySelector('.color-picker-container').classList.add("active");
+
+      canvas.style.cursor = (mode === "eraser") ? "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" style=\"cursor:pointer;\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M20 20L10 10L14 14L20 20Z\"/><path d=\"M10 10L4 4\"/></svg>'), auto" : "crosshair";
+    }
+
+    document.getElementById("eraser-toggle-btn").onclick = (e) => {
+      e.stopPropagation();
+      setTool("eraser");
+      document.getElementById("eraser-popup").classList.toggle("show");
+    };
+
+    document.addEventListener("click", () => {
+      document.getElementById("eraser-popup").classList.remove("show");
+    });
+
+    document.getElementById("eraser-popup").addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
+    const clearBoardBtn = document.getElementById("clear-board-btn");
+    const confirmationModal = document.getElementById("confirmation-modal");
+    const confirmClearBtn = document.getElementById("confirm-clear");
+    const cancelClearBtn = document.getElementById("cancel-clear");
+
+    clearBoardBtn.onclick = () => {
+      confirmationModal.style.display = "block";
+      document.getElementById("eraser-popup").classList.remove("show");
+    };
+
+    confirmClearBtn.onclick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confirmationModal.style.display = "none";
+      savePage();
+    };
+
+    cancelClearBtn.onclick = () => {
+      confirmationModal.style.display = "none";
+    };
+
+    document.getElementById("eraser-btn").onclick = () => {
+      setTool("eraser");
+      document.getElementById("eraser-popup").classList.remove("show");
+    };
+
+    document.getElementById("pen-btn").onclick = () => setTool("pen");
+
+    const colorPickerContainer = document.querySelector('.color-picker-container');
+    const colorPickerInput = document.getElementById('color-picker');
+
+    colorPickerContainer.querySelector('button').onclick = () => {
+      setTool("color");
+      colorPickerInput.click();
+    };
+
+    colorPickerInput.oninput = (e) => {
+      currentColor = e.target.value;
+      colorPickerContainer.style.borderColor = currentColor;
+    };
+
+    colorPickerInput.onchange = () => {
+      setTool('pen');
+    };
+
+    document.getElementById("new-page-btn").onclick = newPage;
+    document.getElementById("next-page-btn").onclick = nextPage;
+    document.getElementById("prev-page-btn").onclick = prevPage;
+    document.getElementById("saved-audios-btn").onclick = showSavedAudiosPage;
+    backToWhiteboardBtn.onclick = hideSavedAudiosPage;
+
+    let recognition, isCapturing = false;
+    let currentTranscript = "";
+
+    function initRecognition() {
+      if ('webkitSpeechRecognition' in window) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = document.getElementById("language-select").value;
+
+        recognition.onresult = async (event) => {
+          let interimTranscript = "";
+          let finalTranscript = "";
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+
+          currentTranscript += finalTranscript;
+          document.getElementById("caption-overlay").innerText = interimTranscript || finalTranscript;
+        };
+
+        recognition.onerror = (event) => {
+          console.error("Speech recognition error:", event.error);
+          document.getElementById("caption-overlay").innerText = "Error: Please check microphone permissions and try again.";
+        };
+
+        recognition.onend = () => {
+          if (isCapturing) {
+            recognition.start();
+          }
+        };
+      } else {
+        alert("Your browser does not support the Web Speech API. Please use a modern browser like Chrome.");
+      }
+    }
+
+    document.getElementById("language-select").onchange = () => {
+      if (isCapturing) {
+        recognition.stop();
+        initRecognition();
+        recognition.start();
+      }
+    };
+
+    document.getElementById("caption-toggle").onclick = () => {
+      if (!isCapturing) {
+        initRecognition();
+        recognition.start();
+        isCapturing = true;
+        document.getElementById("caption-toggle").classList.add("active");
+        document.getElementById("caption-overlay").innerText = "Listening...";
+      } else {
+        recognition.stop();
+        isCapturing = false;
+        document.getElementById("caption-toggle").classList.remove("active");
+        document.getElementById("caption-overlay").innerText = "Captions will appear here...";
+      }
+    };
+
+    let mediaRecorder, recordedChunks = [];
+    let isRecording = false;
+    let isPaused = false;
+    const recordPauseResumeBtn = document.getElementById("record-pause-resume");
+    const recordingIndicator = document.getElementById("recording-indicator");
+
+    document.getElementById("record-start").onclick = async () => {
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          recordedChunks = [];
+
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) recordedChunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(recordedChunks, { type: "audio/webm" });
+            autoSaveToSchedule(audioBlob);
+            alert("Recording saved!");
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          isPaused = false;
+          recordPauseResumeBtn.title = "Pause Recording";
+          recordPauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          recordingIndicator.innerText = "🔴 Recording...";
+          recordingIndicator.classList.remove("recording-paused-indicator");
+          recordingIndicator.style.display = "block";
+        } catch (err) {
+          console.error("Recording failed: ", err);
+          alert("Unable to start recording. Please check microphone permissions.");
+        }
+      }
+    };
+
+    recordPauseResumeBtn.onclick = () => {
+      if (isRecording) {
+        if (mediaRecorder.state === "recording") {
+          mediaRecorder.pause();
+          isPaused = true;
+          recordPauseResumeBtn.title = "Resume Recording";
+          recordPauseResumeBtn.innerHTML = '<i class="fas fa-play"></i>';
+          recordingIndicator.innerText = "⏸️ Paused";
+          recordingIndicator.classList.add("recording-paused-indicator");
+        } else if (mediaRecorder.state === "paused") {
+          mediaRecorder.resume();
+          isPaused = false;
+          recordPauseResumeBtn.title = "Pause Recording";
+          recordPauseResumeBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          recordingIndicator.innerText = "🔴 Recording...";
+          recordingIndicator.classList.remove("recording-paused-indicator");
+        }
+      }
+    };
+
+    document.getElementById("record-stop").onclick = () => {
+      if (isRecording && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+        isRecording = false;
+        isPaused = false;
+        recordingIndicator.style.display = "none";
+      }
+    };
+
+    async function autoSaveToSchedule(audioBlob) {
+      let now = new Date();
+      let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      let today = dayNames[now.getDay()];
+      let currentTime = now.toTimeString().slice(0, 5);
+
+      let saved = false;
+
+      const classToUpdate = classSchedule.find(classItem => {
+        return classItem.day === today && currentTime >= classItem.start && currentTime <= classItem.end;
+      });
+
+      if (classToUpdate) {
+        const base64Audio = await blobToBase64(audioBlob);
+        classToUpdate.audio = { url: base64Audio, type: audioBlob.type };
+        classToUpdate.transcript = currentTranscript;
+        classToUpdate.date = now.toISOString().slice(0, 10);
+        saveToLocalStorage();
+        saved = true;
+      }
+
+      if (!saved) {
+        alert("No scheduled class matches the current time.");
+      }
+      renderSavedAudios(document.getElementById("saved-audios-list"));
+    }
+
+    // A mapping of audio objects to their respective audio players
+    const audioPlayers = {};
+
+    function playAudio(id, button) {
+      const classItem = classSchedule.find(item => item.id == id);
+      if (!classItem || !classItem.audio) return;
+
+      // Find the corresponding audio element if it exists
+      let audio = audioPlayers[id];
+
+      // If another audio is playing, pause it and reset its button
+      if (currentAudio && currentAudio !== audio && !currentAudio.paused) {
+        currentAudio.pause();
+        const otherButton = document.querySelector(`.audio-item button[data-id="${currentAudio.id}"]`);
+        if (otherButton) {
+          otherButton.innerHTML = '🔊 Play';
+        }
+      }
+
+      // Initialize audio player if it doesn't exist
+      if (!audio) {
+        const audioBlob = base64ToBlob(classItem.audio.url, classItem.audio.type);
+        audio = new Audio(URL.createObjectURL(audioBlob));
+        audio.id = id;
+        audioPlayers[id] = audio;
+
+        audio.onended = () => {
+          button.innerHTML = '🔊 Play';
+          currentAudio = null;
+        };
+      }
+
+      currentAudio = audio;
+
+      if (audio.paused) {
+        audio.play();
+        button.innerHTML = '⏸️ Pause';
+      } else {
+        audio.pause();
+        button.innerHTML = '🔊 Play';
+      }
+    }
+
+    function updateAudioSpeed(selectElement, id) {
+      const speed = parseFloat(selectElement.value);
+      if (audioPlayers[id]) {
+        audioPlayers[id].playbackRate = speed;
+      }
+    }
+
+
+    function downloadAudio(id) {
+      const classItem = classSchedule.find(item => item.id == id);
+      if (classItem && classItem.audio) {
+        const audioBlob = base64ToBlob(classItem.audio.url, classItem.audio.type);
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(audioBlob);
+        link.download = `${classItem.subject}_audio.webm`;
+        link.click();
+      }
+    }
+
+    function showCaptions(id) {
+      const classItem = classSchedule.find(item => item.id == id);
+      if (classItem && classItem.transcript) {
+        alert(`Captions for ${classItem.subject}:\n\n${classItem.transcript}`);
+      } else {
+        alert("No captions available for this recording.");
+      }
+    }
+
+    function downloadCaptions(id) {
+      const classItem = classSchedule.find(item => item.id == id);
+      if (classItem && classItem.transcript) {
+        let blob = new Blob([classItem.transcript], { type: "text/plain" });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `captions_${id}.txt`;
+        link.click();
+      } else {
+        alert("No captions available to download!");
+      }
+    }
+
+    const deleteConfirmationModal = document.getElementById("delete-confirmation-modal");
+    const confirmDeleteBtn = document.getElementById("confirm-delete");
+    const cancelDeleteBtn = document.getElementById("cancel-delete");
+    const deleteItemTypeSpan = document.getElementById("delete-item-type");
+
+    function showDeleteConfirmation(id, type) {
+      deleteItemId = id;
+      deleteItemType = type;
+      deleteItemTypeSpan.innerText = type;
+      deleteConfirmationModal.style.display = "flex";
+    }
+
+    confirmDeleteBtn.onclick = () => {
+      if (deleteItemType === 'audio') {
+        const classIndex = classSchedule.findIndex(item => item.id == deleteItemId);
+        if (classIndex !== -1) {
+          delete classSchedule[classIndex].audio;
+          delete classSchedule[classIndex].transcript;
+          delete classSchedule[classIndex].summary;
+          saveToLocalStorage();
+          renderSavedAudios(document.getElementById("saved-audios-list"));
+          renderClassSchedule();
+          alert("Audio recording deleted successfully.");
+        }
+      } else if (deleteItemType === 'video') {
+        savedVideos = savedVideos.filter(video => video.id !== deleteItemId);
+        saveToLocalStorage();
+        renderSavedVideos();
+        alert("Video recording deleted successfully.");
+      }
+      deleteConfirmationModal.style.display = "none";
+      deleteItemId = null;
+      deleteItemType = '';
+    };
+
+    cancelDeleteBtn.onclick = () => {
+      deleteConfirmationModal.style.display = "none";
+      deleteItemId = null;
+      deleteItemType = '';
+    };
+
+    function deleteAudio(id) {
+      showDeleteConfirmation(id, 'audio');
+    }
+
+    function deleteVideo(id) {
+      showDeleteConfirmation(id, 'video');
+    }
+
+    async function generateSummary(id) {
+      const classItem = classSchedule.find(item => item.id == id);
+      if (!classItem || !classItem.transcript) {
+        alert("No transcript available to summarize.");
+        return;
+      }
+
+      const button = document.querySelector(`.audio-item button[data-id="${id}"]`);
+      const originalText = button.innerHTML;
+      button.innerHTML = "Generating...";
+      button.disabled = true;
+
+      try {
+        const summary = await callSummarizationAPI(classItem.transcript);
+
+        classItem.summary = summary;
+        saveToLocalStorage();
+        renderClassSchedule();
+        alert("Summary generated and saved!");
+      } catch (error) {
+        console.error("Error generating summary:", error);
+        alert("Failed to generate summary. Please try again later.");
+      } finally {
+        button.innerHTML = originalText;
+        button.disabled = false;
+      }
+    }
+
+    async function callSummarizationAPI(text) {
+      const apiKey = process.env.OPENAI_API_KEY;
+      const apiUrl = "https://api.openai.com/v1/chat/completions";
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              "role": "system",
+              "content": "You are a helpful assistant that generates a concise summary of the provided text."
+            },
+            {
+              "role": "user",
+              "content": `Please summarize the following text:\n\n${text}`
+            }
+          ],
+          max_tokens: 150,
+          temperature: 0.5,
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("API Error:", errorData);
+        throw new Error(`API call failed with status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.choices[0].message.content.trim();
+    }
+
+    let screenRecorder;
+    let screenRecordingChunks = [];
+    const screenRecordBtn = document.getElementById("screen-record-btn");
+
+    screenRecordBtn.onclick = async () => {
+      if (!screenRecorder || screenRecorder.state === 'inactive') {
+        try {
+          // Corrected line: Capture the stream from the canvas directly
+          const stream = canvas.captureStream();
+          const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.addTrack(audioStream.getAudioTracks()[0]);
+
+          screenRecorder = new MediaRecorder(stream);
+          screenRecordingChunks = [];
+
+          screenRecorder.ondataavailable = (e) => {
+            screenRecordingChunks.push(e.data);
+          };
+
+          screenRecorder.onstop = () => {
+            const blob = new Blob(screenRecordingChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+
+            const now = new Date();
+            const date = now.toISOString().slice(0, 10);
+            const filename = `screen-recording-${date}.webm`;
+
+            savedVideos.push({
+              id: Date.now(),
+              url: url,
+              date: date,
+              filename: filename
+            });
+            saveToLocalStorage();
+            renderSavedVideos();
+            alert("Screen recording saved!");
+
+            stream.getTracks().forEach(track => track.stop());
+            screenRecordBtn.innerHTML = '<i class="fas fa-video"></i>';
+          };
+
+          screenRecorder.start();
+          screenRecordBtn.innerHTML = '<i class="fas fa-stop-circle"></i> Stop';
+
+        } catch (err) {
+          console.error("Error: " + err);
+          alert("Screen recording failed. Please check your permissions.");
+        }
+      } else {
+        screenRecorder.stop();
+        screenRecordBtn.innerHTML = '<i class="fas fa-video"></i>';
+      }
+    };
+
+    const videoModal = document.getElementById("video-modal");
+    const videoPlayer = document.getElementById("video-player");
+    const videoSpeedSelector = document.getElementById("video-speed-selector");
+
+    function playVideo(id) {
+      const videoItem = savedVideos.find(video => video.id === id);
+      if (videoItem) {
+        videoPlayer.src = videoItem.url;
+        videoModal.style.display = "flex";
+        videoPlayer.play();
+        currentVideo = videoItem;
+      }
+    }
+
+    videoSpeedSelector.onchange = () => {
+      if (videoPlayer) {
+        videoPlayer.playbackRate = parseFloat(videoSpeedSelector.value);
+      }
+    };
+
+    document.getElementById("close-video-modal").onclick = () => {
+      videoPlayer.pause();
+      videoModal.style.display = "none";
+      currentVideo = null;
+    };
+
+    // New file handling logic
+    const openFileBtn = document.getElementById("open-file-btn");
+    const fileInput = document.getElementById("file-input");
+
+    openFileBtn.onclick = () => {
+      fileInput.click();
+    };
+
+    let pdfDoc = null;
+    let pdfPageNum = 1;
+    const pdfViewerContainer = document.getElementById("pdf-viewer-container");
+    const pdfViewerCanvas = document.getElementById("pdf-viewer-canvas");
+    const pdfViewerCtx = pdfViewerCanvas.getContext("2d");
+    const pdfViewerControls = document.getElementById("pdf-viewer-controls");
+    const pdfPrevPageBtn = document.getElementById("pdf-prev-page");
+    const pdfNextPageBtn = document.getElementById("pdf-next-page");
+    const pdfExitBtn = document.getElementById("pdf-exit-btn");
+    const pdfPageIndicator = document.getElementById("pdf-page-indicator");
+
+    fileInput.onchange = (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+
+      if (fileExtension === "pdf") {
+        handlePdfUpload(file);
+      } else if (fileExtension === "pptx" || fileExtension === "ppt") {
+        alert("PowerPoint files cannot be opened directly in the browser. A specialized library is needed for this.");
+      } else {
+        alert("Unsupported file type. Please select a PDF or PowerPoint file.");
+      }
+    };
+
+    async function handlePdfUpload(file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const loadingTask = pdfjsLib.getDocument({ data: e.target.result });
+        pdfDoc = await loadingTask.promise;
+
+        pdfPageNum = 1;
+        renderPdfPage(pdfPageNum);
+
+        pdfViewerContainer.style.display = 'flex';
+        pdfViewerControls.style.display = 'flex';
+        document.documentElement.requestFullscreen();
+
+        pdfPrevPageBtn.onclick = () => {
+          if (pdfPageNum <= 1) return;
+          pdfPageNum--;
+          renderPdfPage(pdfPageNum);
+        };
+
+        pdfNextPageBtn.onclick = () => {
+          if (pdfPageNum >= pdfDoc.numPages) return;
+          pdfPageNum++;
+          renderPdfPage(pdfPageNum);
+        };
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    async function renderPdfPage(num) {
+      const page = await pdfDoc.getPage(num);
+
+      const viewport = page.getViewport({ scale: 1 });
+
+      // Use a higher scale for rendering to improve quality
+      const renderScale = 2.0;
+      const scaledViewport = page.getViewport({ scale: renderScale });
+
+      pdfViewerCanvas.width = scaledViewport.width;
+      pdfViewerCanvas.height = scaledViewport.height;
+
+      const renderContext = {
+        canvasContext: pdfViewerCtx,
+        viewport: scaledViewport,
+      };
+
+      await page.render(renderContext).promise;
+      pdfPageIndicator.textContent = `Page ${num} of ${pdfDoc.numPages}`;
+    }
+
+    pdfExitBtn.onclick = () => {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen();
+      }
+      pdfViewerContainer.style.display = 'none';
+      pdfViewerControls.style.display = 'none';
+    };
+
+
+    window.onload = () => {
+      loadFromLocalStorage();
+      populateDropdowns();
+      renderClassSchedule();
+      renderSavedAudios(document.getElementById("saved-audios-list"));
+      renderSavedVideos();
+    };
+  </script>
+</body>
+
+</html>
