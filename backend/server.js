@@ -19,6 +19,12 @@ connectMongoDB();
 // Root route
 app.get("/", (_req, res) => res.send("✅ Backend is running"));
 
+
+// Temporary test route for frontend
+app.get("/api/test", (req, res) => {
+    res.json({ message: "✅ Backend is working!" });
+});
+
 // API routes
 const recapRoutes = require("./routes/recapRoutes"); // ✅ make sure folder is lowercase "routes"
 app.use("/api", recapRoutes);
