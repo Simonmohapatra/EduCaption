@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log("OPENAI_API_KEY is:", process.env.OPENAI_API_KEY);
 const express = require('express');
 const cors = require('cors');
 const { connectMongoDB } = require('./config/db');
@@ -15,17 +16,18 @@ connectMongoDB();
 app.get('/', (_req, res) => res.send('Backend is running ✅'));
 
 // api routes
-app.use('/api', require('./routes/api'));
+app.use('/api', require('./Routes/recapRoutes'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
 
+console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
 
 
-//sim
+
 const { OpenAI } = require("openai");
 
-// Initialize OpenAI client with secret key from .env
+
 const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
@@ -46,3 +48,4 @@ app.post("/chat", async (req, res) => {
         res.status(500).json({ error: "Something went wrong" });
     }
 });
+console.log("OPENAI_API_KEY:", process.env.OPENAI_API_KEY);
